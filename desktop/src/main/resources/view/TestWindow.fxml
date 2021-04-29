@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.canvas.Canvas?>
+<BorderPane prefHeight="550.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8.0.40"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.TestController">
+    <left>
+        <Canvas fx:id="canvas" height="500" width="500"/>
+    </left>
+
+    <right>
+        <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="150.0">
+            <opaqueInsets>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </opaqueInsets>
+            <VBox alignment="TOP_CENTER">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+                <Label>R</Label>
+                <TextField fx:id="rText"/>
+                <Label>G</Label>
+                <TextField fx:id="gText"/>
+                <Label>B</Label>
+                <TextField fx:id="bText"/>
+                <Button fx:id="rgbButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleRgbAction" text="Add Color">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                </Button>
+            </VBox>
+            <HBox alignment="TOP_CENTER">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </HBox.margin>
+                <Button fx:id="randomButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleRandomAction" text="Random Color">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </HBox.margin>
+                </Button>
+                <Spinner fx:id="timeSpinner" prefWidth="80">
+                    <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </HBox.margin>
+                    <valueFactory>
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="100"/>
+                    </valueFactory>
+                </Spinner>
+            </HBox>
+            <VBox alignment="BOTTOM_CENTER">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="100.0"/>
+                </VBox.margin>
+                <HBox alignment="CENTER">
+                    <Label text="Tests: "/>
+                    <Label fx:id="scorePlayer" text="0"/>
+                </HBox>
+                <Button fx:id="executeButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleExecuteAction" text="Execute">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                </Button>
+            </VBox>
+        </VBox>
+    </right>
+</BorderPane>
