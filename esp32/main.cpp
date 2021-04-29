@@ -116,9 +116,9 @@ void get_xy(float* x,float* y,int id){
 }
 void compare_xy_RGB(float x,float y,uint8_t* rgb,int id){
   //convert to XYZ
-  float R=rgb[0]/255;
-  float G=rgb[1]/255;
-  float B=rgb[2]/255;
+  float R=rgb[0]/255.0;
+  float G=rgb[1]/255.0;
+  float B=rgb[2]/255.0;
 
   float X=0.4124564*R+0.3575761*G+0.1804375*B;
   float Y=0.2126729*R+0.7151522*G+0.072175*B;
@@ -130,12 +130,23 @@ void compare_xy_RGB(float x,float y,uint8_t* rgb,int id){
   float y_in=Y/sum;
 
   //compare
-  xy[id*3]=x-x_in;
-  xy[id*3+1]=y-y_in;
-  Serial.println(x-x_in,4);
-  Serial.println(y-y_in,4);
+  xy[id*2]=x-x_in;
+  xy[id*2+1]=y-y_in;
+  //Serial.println(x-x_in,4);
+  //Serial.println(y-y_in,4);
 
 }
+
+void sendDifferences(float* xy,int test_num){
+  for(int i=0;i<2*test_num;i+=2){
+    Serial.print(xy[i],4);
+    Serial.print(",");
+    Serial.print(xy[i+1],4);
+    Serial.print(",");
+  }
+  Serial.write(255);
+}
+
 void testSeq(){
   int test_num;
   while(Serial.available()<1)
@@ -152,9 +163,9 @@ void testSeq(){
 
     uint8_t color[3];
     Serial.readBytes(color, 3);
-    Serial.println(color[0]);
-    Serial.println(color[1]);
-    Serial.println(color[2]);
+    //Serial.println(color[0]);
+    //Serial.println(color[1]);
+    //Serial.println(color[2]);
     float x,y;
     get_xy(&x,&y,i);
     compare_xy_RGB(x,y,color,i);
@@ -162,6 +173,7 @@ void testSeq(){
   }
 
   //analyze();
+  sendDifferences(xy,test_num);
 }
 
 void save_CCT(int id){

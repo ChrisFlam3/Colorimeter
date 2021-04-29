@@ -100,6 +100,7 @@ public class TestController {
     @FXML
     private void handleExecuteAction() {
         new Thread(() -> {
+            int length=colorQueue.size();
             main.sendInitialMessage(colorQueue.size());
 
             while (!colorQueue.isEmpty()) {
@@ -108,7 +109,7 @@ public class TestController {
 
                 sendMessage(color);
             }
-
+            main.receiveDifferences(length);
             // end tests
 //            while(main.waiting){
 //                try{

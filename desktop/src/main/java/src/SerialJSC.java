@@ -6,7 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class SerialJSC {
     SerialPort comPort;
@@ -38,7 +42,28 @@ public class SerialJSC {
         response[0] = 0;
         while (response[0] != (byte)0xFF) {
             int numRead = comPort.readBytes(response, response.length);
-            //System.out.println("Response: " + new String(response, StandardCharsets.US_ASCII));
+            System.out.println("Response: " + new String(response, StandardCharsets.US_ASCII));
         }
     }
+
+    public synchronized List<Float> receiveDifferences (int length) {
+        byte[] response = new byte[15*length];
+        response[0] = 0;
+        List<Float> convertedList=new ArrayList<>();
+        while (response[response.length-1]!= (byte)0xFF) {
+            int available=comPort.bytesAvailable();
+            int numRead = comPort.readBytes(response, available);
+            String responseString=new String(response, StandardCharsets.US_ASCII);
+            System.out.println("Response: " + new String(response, StandardCharsets.US_ASCII));
+            if(response[available-1]== (byte)0xFF)
+                responseString = responseString.substring(0, responseString.length() - 1);
+
+            convertedList.addAll(Stream.of(responseString.split(","))
+                    .map(String::trim)
+                    .map(Float::parseFloat)
+                    .collect(Collectors.toList()));
+        }
+        return convertedList;
+    }
+
 }
