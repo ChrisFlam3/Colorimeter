@@ -5,7 +5,7 @@ from colour.plotting import plot_sds_in_chromaticity_diagram_CIE1931, plot_chrom
 import numpy as np
 
 
-def draw_plot(xs, ys, dxs, dys):
+def draw_plot(xs, ys, dxs, dys, path):
     plot_chromaticity_diagram_CIE1931(standalone=False)
 
     for i in range(len(xs)):
@@ -31,19 +31,20 @@ def draw_plot(xs, ys, dxs, dys):
                      arrowprops=dict(arrowstyle='->', connectionstyle='arc3, rad=-0.2'))
 
 
-    plt.savefig("plot.png")
+    plt.savefig(path + "plot.png")
 
 
 def main():
-    test_count = (len(sys.argv) - 1) // 4
+    test_count = (len(sys.argv) - 2) // 4
+    path = sys.argv[1]
     x, y, dx, dy = [], [], [], []
     for i in range(test_count):
-        x.append(float(sys.argv[2 * i + 1]))
-        y.append(float(sys.argv[2 * i + 2]))
-        dx.append(float(sys.argv[test_count + 2 * i + 1]))
-        dy.append(float(sys.argv[test_count + 2 * i + 2]))
+        x.append(float(sys.argv[2 * i + 2]))
+        y.append(float(sys.argv[2 * i + 3]))
+        dx.append(float(sys.argv[test_count * 2 + 2 * i + 2]))
+        dy.append(float(sys.argv[test_count * 2 + 2 * i + 3]))
 
-    draw_plot(x, y, dx, dy)
+    draw_plot(x, y, dx, dy, path)
 
 
 if __name__ == "__main__":

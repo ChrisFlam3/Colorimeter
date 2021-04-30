@@ -8,9 +8,12 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestController {
     @FXML
@@ -100,6 +103,12 @@ public class TestController {
     @FXML
     private void handleExecuteAction() {
         new Thread(() -> {
+            String path = System.getProperty("user.dir");
+
+            List<Float> xys = TestController.colorsToXy(this.colorQueue);
+            List<String> xysStrings = new ArrayList<>();
+            xys.stream().map(x -> x.toString()).forEach(xysStrings::add);
+
             int length=colorQueue.size();
             main.sendInitialMessage(colorQueue.size());
 
@@ -109,13 +118,25 @@ public class TestController {
 
                 sendMessage(color);
             }
-            main.receiveDifferences(length);
-            // end tests
-//            while(main.waiting){
-//                try{
-//                    wait();
-//                } catch(InterruptedException ignored){}
-//            }
+
+            List<Float> dxdys = main.receiveDifferences(length);
+            List<String> dxdysStrings = new ArrayList<>();
+            dxdys.stream().map(x -> x.toString()).forEach(xysStrings::add);
+
+            List<String> commands = new ArrayList<>();
+            commands.add("python");
+            commands.add(path + "plot.py");
+            commands.add(path);
+            commands.addAll(xysStrings);
+            commands.addAll(dxdysStrings);
+
+            ProcessBuilder pb = new ProcessBuilder(commands);
+            try {
+                Process p = pb.start();
+                p.waitFor(); // Wait for the process to finish.
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
 
         }).start();
     }
@@ -125,4 +146,32 @@ public class TestController {
         gc.setFill(color);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
+
+    private void drawImage (String path) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        Image image = new Image(path);
+        gc.drawImage(image, 0, 0);
+    }
+
+    public static List<Float> colorsToXy (List<Color> colors) {
+        List<Float> xys = new ArrayList<>();
+        for (Color color: colors){
+            double red = color.getRed();
+            double green = color.getGreen();
+            double blue = color.getBlue();
+
+            double X = 0.4124 * red + 0.3576 * green + 0.1805 * blue;
+            double Y = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+            double Z = 0.0193 * red + 0.1192 * green + 0.9505 * blue;
+
+            float x = (float)(X / (X + Y + Z));
+            float y = (float)(X / (X + Y + Z));
+
+            xys.add(x);
+            xys.add(y);
+        }
+        return xys;
+    }
+
+//    public static void
 }
