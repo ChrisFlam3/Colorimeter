@@ -31,7 +31,7 @@ def draw_plot(xs, ys, dxs, dys, path):
                      arrowprops=dict(arrowstyle='->', connectionstyle='arc3, rad=-0.2'))
 
 
-    plt.savefig(path + "plot.png")
+    plt.savefig(path + "\\plot.png")
 
 
 def main():

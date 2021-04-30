@@ -125,7 +125,7 @@ public class TestController {
 
             List<String> commands = new ArrayList<>();
             commands.add("python");
-            commands.add(path + "plot.py");
+            commands.add(path + "\\plot.py");
             commands.add(path);
             commands.addAll(xysStrings);
             commands.addAll(dxdysStrings);
@@ -137,6 +137,8 @@ public class TestController {
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
+
+            drawImage(path + "\\plot.py");
 
         }).start();
     }
