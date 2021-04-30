@@ -47,16 +47,17 @@ public class SerialJSC {
     }
 
     public synchronized List<Float> receiveDifferences (int length) {
-        byte[] response = new byte[15*length];
+        byte[] response = new byte[17*length];
         response[0] = 0;
         List<Float> convertedList=new ArrayList<>();
-        while (response[response.length-1]!= (byte)0xFF) {
-            int available=comPort.bytesAvailable();
+        int available=1;
+        while (response[available-1]!= (byte)0xFF) {
+            available=comPort.bytesAvailable();
             int numRead = comPort.readBytes(response, available);
             String responseString=new String(response, StandardCharsets.US_ASCII);
             System.out.println("Response: " + new String(response, StandardCharsets.US_ASCII));
             if(response[available-1]== (byte)0xFF)
-                responseString = responseString.substring(0, responseString.length() - 1);
+                responseString = responseString.substring(0, available - 1);
 
             convertedList.addAll(Stream.of(responseString.split(","))
                     .map(String::trim)
