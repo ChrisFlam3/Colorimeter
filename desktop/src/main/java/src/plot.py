@@ -30,8 +30,9 @@ def draw_plot(xs, ys, dxs, dys, path):
                      textcoords='offset points',
                      arrowprops=dict(arrowstyle='->', connectionstyle='arc3, rad=-0.2'))
 
-
-    plt.savefig(path + "\\plot.png")
+    fig = plt.gcf()
+    fig.set_size_inches(5, 5)
+    fig.savefig(path + "\\plot.png", dpi=96)
 
 
 def main():

@@ -4,10 +4,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.Canvas?>
+<?import java.awt.Toolkit.*?>
 <BorderPane prefHeight="550.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8.0.40"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.TestController">
     <left>
-        <Canvas fx:id="canvas" height="500" width="500"/>
+        <Canvas fx:id="canvas" height="480" width="480"/>
     </left>
 
     <right>

@@ -103,7 +103,7 @@ public class TestController {
     @FXML
     private void handleExecuteAction() {
         new Thread(() -> {
-            String path = System.getProperty("user.dir");
+            String path = "file:///" + System.getProperty("user.dir") + "\\src\\main\\java\\src";
 
             List<Float> xys = TestController.colorsToXy(this.colorQueue);
             List<String> xysStrings = new ArrayList<>();
@@ -138,7 +138,7 @@ public class TestController {
                 e.printStackTrace();
             }
 
-            drawImage(path + "\\plot.py");
+            drawImage(path + "\\plot.png");
 
         }).start();
     }
@@ -150,6 +150,7 @@ public class TestController {
     }
 
     private void drawImage (String path) {
+        setCanvasColor(Color.WHITE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         Image image = new Image(path);
         gc.drawImage(image, 0, 0);
