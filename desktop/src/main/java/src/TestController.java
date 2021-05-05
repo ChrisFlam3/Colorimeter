@@ -103,7 +103,7 @@ public class TestController {
     @FXML
     private void handleExecuteAction() {
         new Thread(() -> {
-            String path = "file:///" + System.getProperty("user.dir") + "\\src\\main\\java\\src";
+            String path = System.getProperty("user.dir") + "\\src\\main\\java\\src";
 
             List<Float> xys = TestController.colorsToXy(this.colorQueue);
             List<String> xysStrings = new ArrayList<>();
@@ -114,8 +114,20 @@ public class TestController {
 
             while (!colorQueue.isEmpty()) {
                 Color color = colorQueue.remove(0);
-                setColor(color);
-
+                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
+                for(int i=0;i<3;i++){
+                    if(rgb[i]<=0.0031308)
+                        rgb[i]=12.92*rgb[i];
+                    else
+                        rgb[i]=(1.055*Math.pow(rgb[i],1/2.2)-0.055);
+                }
+                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
+                setColor(corrected);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 sendMessage(color);
             }
 
@@ -138,7 +150,7 @@ public class TestController {
                 e.printStackTrace();
             }
 
-            drawImage(path + "\\plot.png");
+            drawImage("file:///" + path + "\\plot.png");
 
         }).start();
     }
@@ -159,16 +171,22 @@ public class TestController {
     public static List<Float> colorsToXy (List<Color> colors) {
         List<Float> xys = new ArrayList<>();
         for (Color color: colors){
-            double red = color.getRed();
-            double green = color.getGreen();
-            double blue = color.getBlue();
+            double[] rgb=new double[3];
+            rgb[0] = color.getRed();
+            rgb[1] = color.getGreen();
+            rgb[2] = color.getBlue();
 
-            double X = 0.4124 * red + 0.3576 * green + 0.1805 * blue;
-            double Y = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-            double Z = 0.0193 * red + 0.1192 * green + 0.9505 * blue;
+
+            double X = 0.4124 * rgb[0] + 0.3576 *  rgb[1] + 0.1805 * rgb[2];
+            double Y = 0.2126 * rgb[0] + 0.7152 *  rgb[1] + 0.0722 * rgb[2];
+            double Z = 0.0193 * rgb[0] + 0.1192 *  rgb[1] + 0.9505 * rgb[2];
+            
+           // double X=0.4887180*rgb[0]+  0.3106803*rgb[1]+  0.2006017*rgb[2];
+           // double Y=0.1762044*rgb[0]+  0.8129847*rgb[1]+  0.0108109*rgb[2];
+           // double Z=0.0000000*rgb[0]+  0.0102048*rgb[1]+  0.9897952*rgb[2];
 
             float x = (float)(X / (X + Y + Z));
-            float y = (float)(X / (X + Y + Z));
+            float y = (float)(Y / (X + Y + Z));
 
             xys.add(x);
             xys.add(y);
