@@ -14,8 +14,13 @@ uint8_t cmdLED0[9]={'A','T','L','E','D','0','=','0',0};
 uint8_t cmdLED100[9]={'A','T','L','E','D','0','=','1',0};
 uint8_t cmdLED[7]={'A','T','L','E','D','0',0};
 uint8_t cmdINTTIME100[14] = {'A','T','I','N','T','T','I','M','E','=','1','0','0',0};
+uint8_t cmdINTTIME[9] = {'A','T','I','N','T','T','I','M','E'};
 uint8_t cmdGAIN3[9] = {'A','T','G','A','I','N','=','3',0};
+uint8_t cmdGAIN[6] = {'A','T','G','A','I','N'};
 uint8_t cmdMODE2[10] = {'A','T','T','C','S','M','D','=','2',0};
+uint8_t cmdATINTRVL[8] = {'A','T','I','N','T','R','V','L'};
+uint8_t cmdDUV[6] = {'A','T','D','U','V','C'};
+uint8_t cmdPRIME[10] = {'A','T','U','V','P','R','I','M','E','C'};
 
 HardwareSerial sensorSerial(1);
 
@@ -23,6 +28,7 @@ int sample_num=10;
 float* XYZ;
 float* xy;
 float* CCT;
+float* LUX;
 static void transmitCommand( uint8_t *pInput, uint8_t delimiter )
 {
     while (0 != *pInput)
@@ -48,10 +54,10 @@ void emptySensorSerial(){
 
 void configure(){
   transmitCommand(cmdGAIN3, TERMINATION_CHAR);
+  delay(100);
   transmitCommand(cmdMODE2, TERMINATION_CHAR);
-  while(sensorSerial.available()==0)
-    continue;
-  emptySensorSerial();
+  delay(100);
+  transmitCommand(cmdINTTIME100,0x0A);
 }
 
 void setup() {
@@ -74,25 +80,33 @@ void get_xy(float* x,float* y,int id){
   float Z_avg=0;
   for(int i=0;i<sample_num;i++){
     transmitCommand(cmdDATA,TERMINATION_CHAR);
-    float X=sensorSerial.parseInt();
-    float Y=sensorSerial.parseInt();
-    float Z=sensorSerial.parseInt();
-    float NIR=sensorSerial.parseInt();
-    float D=sensorSerial.parseInt();
-    float C=sensorSerial.parseInt();
-    
-    //Serial.println(X);
-    //Serial.println(Y);
-    //Serial.println(Z);
+    delay(50);
+    int X=sensorSerial.parseInt();
+    int Y=sensorSerial.parseInt();
+    int Z=sensorSerial.parseInt();
+    int NIR=sensorSerial.parseInt();
+    int D=sensorSerial.parseInt();
+    int C=sensorSerial.parseInt();
 
-    X_avg+=X;
-    Y_avg+=Y;
-    Z_avg+=Z;
+    float W=100*2.8*64*0.7289;
+    float Xf=250*(X-D)/W;
+    float Yf=250*(Y-D)/W;
+    float Zf=250*(Z-D)/W;
+
+    
+   // Serial.println(Xf);
+   // Serial.println(Yf);
+    //Serial.println(Zf);
+
+    X_avg+=Xf;
+    Y_avg+=Yf;
+    Z_avg+=Zf;
     
   }
   X_avg/=sample_num;
   Y_avg/=sample_num;
   Z_avg/=sample_num;
+  
   
   XYZ[id*3]=X_avg;
   XYZ[id*3+1]=Y_avg;
@@ -101,7 +115,7 @@ void get_xy(float* x,float* y,int id){
   //Serial.println(X_avg);
   //Serial.println(Y_avg);
   //Serial.println(Z_avg);
-  
+
   int sum=X_avg+Y_avg+Z_avg;
   X_avg/=sum;
   Y_avg/=sum;
@@ -113,21 +127,44 @@ void get_xy(float* x,float* y,int id){
 
   *x=X_avg;
   *y=Y_avg;
+
+  //Serial.println(*x,4);
+  //Serial.println(*y,4);
 }
 void compare_xy_RGB(float x,float y,uint8_t* rgb,int id){
   //convert to XYZ
   float R=rgb[0]/255.0;
   float G=rgb[1]/255.0;
   float B=rgb[2]/255.0;
+  //gamma correction
+  //for(int i=0;i<3;i++){
+   // if(rgb[i]<=0.04045)
+    //  rgb[i]=rgb[i]/12.92;
+   //else
+   //   rgb[i]=pow((rgb[i]+0.055)/1.055, 2.0);
+  //}
 
-  float X=0.4124564*R+0.3575761*G+0.1804375*B;
-  float Y=0.2126729*R+0.7151522*G+0.072175*B;
-  float Z=0.0193339*R+0.119192*G+0.9503041*B;
+ //for(int i=0;i<3;i++){
+ //   if(rgb[i]<=0.0031308)
+ //     rgb[i]=12.92*rgb[i];
+ //   else
+ //     rgb[i]=(1.055*pow(rgb[i],1/2.2)-0.055);
+ // }
+
+  //srgb
+  double X=0.4124564*R+0.3575761*G+0.1804375*B;
+  double Y=0.2126729*R+0.7151522*G+0.072175*B;
+  double Z=0.0193339*R+0.119192*G+0.9503041*B;
+  //cie
+  //double X=0.4887180*R+  0.3106803*G+  0.2006017*B;
+  //double Y=0.1762044*R+  0.8129847*G+  0.0108109*B;
+  //double Z=0.0000000*R+  0.0102048*G+  0.9897952*B;
 
   //convert to xy
-  float sum=X+Y+Z;
-  float x_in=X/sum;
-  float y_in=Y/sum;
+  double sum=X+Y+Z;
+  double x_in=X/sum;
+  double y_in=Y/sum;
+
 
   //compare
   xy[id*2]=x-x_in;
@@ -177,7 +214,7 @@ void testSeq(){
 }
 
 void save_CCT(int id){
-  float cct_avg;
+  float cct_avg=0;
   for(int i=0;i<sample_num;i++){
     transmitCommand(cmdCCT,TERMINATION_CHAR);
     float cct=sensorSerial.parseInt();
@@ -189,12 +226,35 @@ void save_CCT(int id){
 
 void testCCT(){
   int test_num;
-  while(Serial.available()<4)
+  while(Serial.available()<1)
     continue;
   test_num=Serial.parseInt();
   CCT=(float*)malloc(test_num*sizeof(float));
   for(int i=0;i<test_num;i++){
     save_CCT(i);
+    Serial.println(255);
+  }
+}
+
+void save_LUX(int id){
+  float lux_avg=0;
+  for(int i=0;i<sample_num;i++){
+    transmitCommand(cmdLUX,TERMINATION_CHAR);
+    float lux=sensorSerial.parseInt();
+    lux_avg+=lux;
+  }
+  lux_avg/=sample_num;
+  LUX[id]=lux_avg;
+}
+
+void testLUX(){
+  int test_num;
+  while(Serial.available()<1)
+    continue;
+  test_num=Serial.parseInt();
+  LUX=(float*)malloc(test_num*sizeof(float));
+  for(int i=0;i<test_num;i++){
+    save_LUX(i);
     Serial.println(255);
   }
 }
@@ -216,10 +276,9 @@ void statusUpdate(){
     case 'c':
       testCCT();
     break;
-
-
-
-
+    case 'l':
+    testLUX();
+    break;
 
   }
 
@@ -235,13 +294,23 @@ void loop() {
   //emptySensorSerial();
 
 
-
-  transmitCommand(cmdLED0,TERMINATION_CHAR);
   delay(1000);
-  transmitCommand(cmdLED100,TERMINATION_CHAR);
+  transmitCommand(cmdLED0,TERMINATION_CHAR);
   //delay(1000);
-  //emptySensorSerial();
+  //transmitCommand(cmdLED100,TERMINATION_CHAR);
+  delay(1000);
+  emptySensorSerial();
   statusUpdate();
 
+  //sensorSerial.write(cmdPRIME,10);
+  //sensorSerial.write('\n');
+  //delay(100);
+  //while(sensorSerial.available())
+  //Serial.println(sensorSerial.parseFloat());
 
+  //while(true){
+  //float x,y;
+  //get_xy(&x,&y,0);
+  //delay(1000);
+  //}
 }
