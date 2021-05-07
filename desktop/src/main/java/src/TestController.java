@@ -174,14 +174,14 @@ public class TestController {
         double width = canvas.getWidth();
         String filename = "";
         int inches = 5;
-        while(inches < 24) {
+        while(inches < 23) {
             if (height < (inches + 0.5) * 96){
                 filename = "\\plot" + Integer.toString(inches) + ".png";
                 break;
             }
-            inches++;
+            inches += 6;
         }
-        if (inches == 24) {
+        if (inches >= 23) {
             filename = "\\plot" + Integer.toString(inches) + ".png";
         }
         setCanvasColor(Color.WHITE);
