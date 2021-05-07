@@ -59,7 +59,7 @@ public class TestController {
 
     @FXML
     private void initialize() {
-        this.isStateTesting = false;
+        this.isStateTesting = true;
         this.colorQueue = FXCollections.observableArrayList();
 
         new Thread(this::initializeSerial).start();

@@ -108,4 +108,4 @@ Temporary Items
 
 /python/.idea
 /python/venv
-/resources/plots
+/resources/plots/*
