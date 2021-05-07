@@ -44,7 +44,9 @@ public class TestController {
 
     public void setAppController(AppController appController) {
         this.appController = appController;
-        drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+        if (!this.isStateTesting) {
+            drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+        }
 
         this.appController.primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> {
             if (this.appController.primaryStage.getHeight() > 0) {
@@ -172,12 +174,15 @@ public class TestController {
         double width = canvas.getWidth();
         String filename = "";
         int inches = 5;
-        while(inches < 12) {
+        while(inches < 24) {
             if (height < (inches + 0.5) * 96){
                 filename = "\\plot" + Integer.toString(inches) + ".png";
                 break;
             }
             inches++;
+        }
+        if (inches == 24) {
+            filename = "\\plot" + Integer.toString(inches) + ".png";
         }
         setCanvasColor(Color.WHITE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
