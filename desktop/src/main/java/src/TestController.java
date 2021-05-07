@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestController {
+    private boolean isStateTesting;
+
     @FXML
     public Spinner<Integer> timeSpinner;
 
@@ -38,7 +40,6 @@ public class TestController {
     @FXML
     private Label scorePlayer;
 
-//    private SerialRXTX main;
     private SerialJSC main;
 
     public void setAppController(AppController appController) {
@@ -50,21 +51,21 @@ public class TestController {
                 this.canvas.setHeight(this.appController.primaryStage.getHeight() - 50);
                 this.canvas.setWidth(this.appController.primaryStage.getHeight() - 50);
             }
-            drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+            if (!this.isStateTesting) {
+                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+            }
         });
     }
 
     @FXML
     private void initialize() {
-        colorQueue = FXCollections.observableArrayList();
-
-        setCanvasColor(Color.WHITE);
+        this.isStateTesting = false;
+        this.colorQueue = FXCollections.observableArrayList();
 
         new Thread(this::initializeSerial).start();
     }
 
     private void initializeSerial() {
-//        main = new SerialRXTX();
         main = new SerialJSC();
         main.initialize();
     }
@@ -106,6 +107,7 @@ public class TestController {
     private void handleExecuteAction() {
         new Thread(() -> {
             if (!colorQueue.isEmpty()) {
+                this.isStateTesting = true;
                 String pythonPath = System.getProperty("user.dir") + "\\src\\main\\python";
                 String plotPath = System.getProperty("user.dir") + "\\src\\main\\resources\\plots";
 
@@ -155,7 +157,7 @@ public class TestController {
                 }
 
                 drawImage("file:///" + plotPath);
-
+                this.isStateTesting = false;
         }}).start();
     }
 
