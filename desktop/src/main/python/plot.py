@@ -37,10 +37,12 @@ def draw_plot(xs, ys, dxs, dys, path):
     plt.title("")
     fig = plt.gcf()
     fig.suptitle("")
-    fig.set_size_inches(5, 5)
     for arrow in arrows:
         fig.add_artist(arrow)
-    fig.savefig(path + "\\plot.png", dpi=96)
+
+    for i in range(5, 13):
+        fig.set_size_inches(i, i)
+        fig.savefig(path + "\\plot" + str(i) + ".png", dpi=96)
 
 
 def main():

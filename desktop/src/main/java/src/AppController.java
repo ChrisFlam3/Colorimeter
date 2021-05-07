@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class AppController {
 
-    private Stage primaryStage;
+    public Stage primaryStage;
 
     public AppController(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -31,8 +31,10 @@ public class AppController {
 
             // add layout to a scene and show them all
             Scene scene = new Scene(rootLayout);
-            primaryStage.setScene(scene);
-            primaryStage.show();
+            this.primaryStage.setScene(scene);
+            this.primaryStage.show();
+            this.primaryStage.minHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
+            this.primaryStage.maxHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
 
         } catch (IOException e) {
             // don't do this in common apps

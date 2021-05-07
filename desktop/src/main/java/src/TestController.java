@@ -43,12 +43,23 @@ public class TestController {
 
     public void setAppController(AppController appController) {
         this.appController = appController;
+        drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+
+        this.appController.primaryStage.widthProperty().addListener((observable, oldValue, newValue) -> {
+            if (this.appController.primaryStage.getHeight() > 0) {
+                this.canvas.setHeight(this.appController.primaryStage.getHeight() - 50);
+                this.canvas.setWidth(this.appController.primaryStage.getHeight() - 50);
+            }
+            drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+        });
     }
 
     @FXML
     private void initialize() {
         colorQueue = FXCollections.observableArrayList();
+
         setCanvasColor(Color.WHITE);
+
         new Thread(this::initializeSerial).start();
     }
 
@@ -89,70 +100,63 @@ public class TestController {
         byte[] message = {red, green, blue};
 
         main.sendMessage(message);
-//        main.goToSleep();
-//
-//        try {
-//            main.output.write(message);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        main.makeBed();
     }
 
     @FXML
     private void handleExecuteAction() {
         new Thread(() -> {
-            String path = System.getProperty("user.dir") + "\\src\\main\\java\\src";
+            if (!colorQueue.isEmpty()) {
+                String pythonPath = System.getProperty("user.dir") + "\\src\\main\\python";
+                String plotPath = System.getProperty("user.dir") + "\\src\\main\\resources\\plots";
 
-            List<Float> xys = TestController.colorsToXy(this.colorQueue);
-            List<String> xysStrings = new ArrayList<>();
-            xys.stream().map(x -> x.toString()).forEach(xysStrings::add);
+                List<Float> xys = TestController.colorsToXy(this.colorQueue);
+                List<String> xysStrings = new ArrayList<>();
+                xys.stream().map(x -> x.toString()).forEach(xysStrings::add);
 
-            int length=colorQueue.size();
-            main.sendInitialMessage(colorQueue.size());
+                int length=colorQueue.size();
+                main.sendInitialMessage(colorQueue.size());
 
-            while (!colorQueue.isEmpty()) {
-                Color color = colorQueue.remove(0);
-                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
-                for(int i=0;i<3;i++){
-                    if(rgb[i]<=0.0031308)
-                        rgb[i]=12.92*rgb[i];
-                    else
-                        rgb[i]=(1.055*Math.pow(rgb[i],1/2.2)-0.055);
+                while (!colorQueue.isEmpty()) {
+                    Color color = colorQueue.remove(0);
+                    double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
+                    for(int i=0;i<3;i++){
+                        if(rgb[i]<=0.0031308)
+                            rgb[i]=12.92*rgb[i];
+                        else
+                            rgb[i]=(1.055*Math.pow(rgb[i],1/2.2)-0.055);
+                    }
+                    Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
+                    setColor(corrected);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    sendMessage(color);
                 }
-                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
-                setColor(corrected);
+
+                List<Float> dxdys = main.receiveDifferences(length);
+                List<String> dxdysStrings = new ArrayList<>();
+                dxdys.stream().map(x -> x.toString()).forEach(xysStrings::add);
+
+                List<String> commands = new ArrayList<>();
+                commands.add("python");
+                commands.add(pythonPath + "\\plot.py");
+                commands.add(plotPath);
+                commands.addAll(xysStrings);
+                commands.addAll(dxdysStrings);
+
+                ProcessBuilder pb = new ProcessBuilder(commands);
                 try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
+                    Process p = pb.start();
+                    p.waitFor(); // Wait for the process to finish.
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
-                sendMessage(color);
-            }
 
-            List<Float> dxdys = main.receiveDifferences(length);
-            List<String> dxdysStrings = new ArrayList<>();
-            dxdys.stream().map(x -> x.toString()).forEach(xysStrings::add);
+                drawImage("file:///" + plotPath);
 
-            List<String> commands = new ArrayList<>();
-            commands.add("python");
-            commands.add(path + "\\plot.py");
-            commands.add(path);
-            commands.addAll(xysStrings);
-            commands.addAll(dxdysStrings);
-
-            ProcessBuilder pb = new ProcessBuilder(commands);
-            try {
-                Process p = pb.start();
-                p.waitFor(); // Wait for the process to finish.
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            drawImage("file:///" + path + "\\plot.png");
-
-        }).start();
+        }}).start();
     }
 
     private void setCanvasColor (Color color) {
@@ -162,9 +166,20 @@ public class TestController {
     }
 
     private void drawImage (String path) {
+        double height = canvas.getHeight();
+        double width = canvas.getWidth();
+        String filename = "";
+        int inches = 5;
+        while(inches < 12) {
+            if (height < (inches + 0.5) * 96){
+                filename = "\\plot" + Integer.toString(inches) + ".png";
+                break;
+            }
+            inches++;
+        }
         setCanvasColor(Color.WHITE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        Image image = new Image(path);
+        Image image = new Image(path + filename, width, height, false, true);
         gc.drawImage(image, 0, 0);
     }
 
@@ -193,6 +208,4 @@ public class TestController {
         }
         return xys;
     }
-
-//    public static void
 }
