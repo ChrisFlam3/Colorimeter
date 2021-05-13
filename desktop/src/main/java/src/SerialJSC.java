@@ -22,9 +22,9 @@ public class SerialJSC {
         this.comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
     }
 
-    public synchronized void sendInitialMessage (int length) {
+    public synchronized void sendInitialMessage (byte type, int length) {
 
-        comPort.writeBytes(new byte[]{116}, 1);
+        comPort.writeBytes(new byte[]{type}, 1);
 
         comPort.writeBytes(Integer.toString(length).getBytes(), Integer.toString(length).getBytes().length);
         byte[] response = new byte[1];
@@ -71,6 +71,21 @@ public class SerialJSC {
                     .collect(Collectors.toList()));
 
         return convertedList;
+    }
+
+    public synchronized Float receiveFloat () {
+        while (true) {
+            int available = comPort.bytesAvailable();
+            if(available<1)
+                continue;
+            byte[] response = new byte[available];
+            int numRead = comPort.readBytes(response, available);
+            if(numRead<1)
+                continue;
+            String responseString = new String(response, StandardCharsets.US_ASCII);
+
+            return Float.parseFloat(responseString);
+        }
     }
 
 }

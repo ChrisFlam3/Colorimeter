@@ -24,6 +24,8 @@ public class AppController {
             loader.setLocation(TestController.class
                     .getResource("../view/TestWindow.fxml"));
             BorderPane rootLayout = (BorderPane) loader.load();
+//            rootLayout.prefHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
+//            rootLayout.prefWidthProperty().bind(this.primaryStage.heightProperty().add(175));
 
             // set initial data into controller
             TestController controller = loader.getController();
@@ -33,8 +35,11 @@ public class AppController {
             Scene scene = new Scene(rootLayout);
             this.primaryStage.setScene(scene);
             this.primaryStage.show();
-            this.primaryStage.minHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
-            this.primaryStage.maxHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
+            this.primaryStage.setResizable(true);
+//            this.primaryStage.minHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
+//            this.primaryStage.maxHeightProperty().bind(this.primaryStage.widthProperty().add(-175));
+//            this.primaryStage.minWidthProperty().bind(this.primaryStage.heightProperty().add(175));
+//            this.primaryStage.maxWidthProperty().bind(this.primaryStage.heightProperty().add(175));
 
         } catch (IOException e) {
             // don't do this in common apps

@@ -8,7 +8,7 @@
 <BorderPane prefHeight="550.0" prefWidth="675.0" xmlns="http://javafx.com/javafx/8.0.40"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="src.TestController">
     <left>
-        <Canvas fx:id="canvas" height="475" width="475"/>
+        <Canvas fx:id="canvas" height="500" width="500"/>
     </left>
 
     <right>
@@ -52,18 +52,46 @@
                     </valueFactory>
                 </Spinner>
             </HBox>
-            <VBox alignment="BOTTOM_CENTER">
+            <VBox alignment="CENTER">
+                <Spinner fx:id="measurementSpinner" prefWidth="120">
+                    <HBox.margin>
+                        <Insets bottom="5.0" top="5.0"/>
+                    </HBox.margin>
+                    <valueFactory>
+                        <SpinnerValueFactory.IntegerSpinnerValueFactory min="1" max="100"/>
+                    </valueFactory>
+                </Spinner>
                 <VBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="100.0"/>
+                    <Insets bottom="100.0" left="5.0" right="5.0" top="100.0"/>
                 </VBox.margin>
+                <Button fx:id="cctButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleCctAction" text="Measure CCT">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                </Button>
+                <Button fx:id="luxButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleLuxAction" text="Measure Illuminance">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                </Button>
+                <HBox alignment="CENTER">
+                    <Label fx:id="measurement"/>
+                    <Label fx:id="result"/>
+                    <Label fx:id="unit"/>
+                </HBox>
+            </VBox>
+
+            <VBox alignment="BOTTOM_CENTER">
                 <HBox alignment="CENTER">
                     <Label text="Tests: "/>
-                    <Label fx:id="scorePlayer" text="0"/>
+                    <Label fx:id="testCount" text="0"/>
                 </HBox>
                 <Button fx:id="executeButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
                         mnemonicParsing="false" onAction="#handleExecuteAction" text="Execute">
                     <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="0.0" left="5.0" right="5.0" top="5.0"/>
                     </VBox.margin>
                 </Button>
             </VBox>
