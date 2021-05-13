@@ -66,7 +66,7 @@ public class TestController {
                         this.appController.primaryStage.getHeight() - 50 : this.appController.primaryStage.getWidth() - 175;
                 this.canvas.setHeight(size);
                 this.canvas.setWidth(size);
-                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+//                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
             }
             if (!this.isStateTesting) {
                 drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
@@ -79,7 +79,7 @@ public class TestController {
                         this.appController.primaryStage.getHeight() - 50 : this.appController.primaryStage.getWidth() - 175;
                 this.canvas.setHeight(size);
                 this.canvas.setWidth(size);
-                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+//                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
             }
             if (!this.isStateTesting) {
                 drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
@@ -138,7 +138,7 @@ public class TestController {
         if (measurementSpinner.getValue() > 0){
             new Thread(() -> {
                 this.isStateTesting = true;
-                sendMessage(Color.WHITE);
+                setColor(Color.WHITE);
                 main.sendInitialMessage((byte) 99, measurementSpinner.getValue());
                 float result = main.receiveFloat();
                 setCctText(result);
@@ -152,7 +152,7 @@ public class TestController {
         if (measurementSpinner.getValue() > 0){
             new Thread(() -> {
                 this.isStateTesting = true;
-                sendMessage(Color.WHITE);
+                setColor(Color.WHITE);
                 main.sendInitialMessage((byte) 108, measurementSpinner.getValue());
                 float result = main.receiveFloat();
                 setLuxText(result);
