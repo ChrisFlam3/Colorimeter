@@ -244,17 +244,17 @@ public class TestController {
         double height = canvas.getHeight();
         double width = canvas.getWidth();
         String filename = "";
-        int inches = 4;
-        while(inches < 9) {
-            if (height < (inches + 0.5) * 96){
-                filename = "\\plot" + Integer.toString(inches) + ".png";
-                break;
-            }
-            inches += 2;
-        }
-        if (inches >= 9) {
-            filename = "\\plot" + Integer.toString(inches) + ".png";
-        }
+        int inches = 10;
+//        while(inches < 9) {
+//            if (height < (inches + 0.5) * 96){
+//                filename = "\\plot" + Integer.toString(inches) + ".png";
+//                break;
+//            }
+//            inches += 2;
+//        }
+//        if (inches >= 9) {
+        filename = "\\plot" + Integer.toString(inches) + ".png";
+//        }
         setCanvasColor(Color.WHITE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         Image image = new Image(path + filename, width, height, false, true);
