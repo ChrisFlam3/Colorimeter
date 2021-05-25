@@ -5,11 +5,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,6 +32,8 @@ public class TestController {
     private AppController appController;
 
     private ObservableList<Color> colorQueue;
+
+    private ObservableList<Float> calibrationMatrix;
 
     @FXML
     private TextField rText;
@@ -52,6 +59,12 @@ public class TestController {
     @FXML
     private Label unit;
 
+    @FXML
+    private GridPane matrixGrid;
+
+    @FXML
+    private Button clipboardButton;
+
     private SerialJSC main;
 
     public void setAppController(AppController appController) {
@@ -66,7 +79,6 @@ public class TestController {
                         this.appController.primaryStage.getHeight() - 50 : this.appController.primaryStage.getWidth() - 175;
                 this.canvas.setHeight(size);
                 this.canvas.setWidth(size);
-//                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
             }
             if (!this.isStateTesting) {
                 drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
@@ -79,7 +91,6 @@ public class TestController {
                         this.appController.primaryStage.getHeight() - 50 : this.appController.primaryStage.getWidth() - 175;
                 this.canvas.setHeight(size);
                 this.canvas.setWidth(size);
-//                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
             }
             if (!this.isStateTesting) {
                 drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
@@ -91,6 +102,9 @@ public class TestController {
     private void initialize() {
         this.isStateTesting = true;
         this.colorQueue = FXCollections.observableArrayList();
+        this.calibrationMatrix = FXCollections.observableArrayList();
+
+        this.clipboardButton.setVisible(false);
 
         new Thread(this::initializeSerial).start();
     }
@@ -161,6 +175,36 @@ public class TestController {
         }
     }
 
+    @FXML
+    private void handleMatrixAction() {
+        new Thread(() -> {
+            setColor(Color.WHITE);
+            main.sendInitialMessage((byte) 100, measurementSpinner.getValue());
+            calibrationMatrix.clear();
+            for(int i = 0; i < 9; i++) {
+                calibrationMatrix.add(main.receiveFloat());
+            }
+            setCalibrationMatrix();
+        }).start();
+    }
+
+    @FXML
+    private void handleClipboardAction() {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        StringBuilder toCopy = new StringBuilder();
+        for (int i = 0; i < 9; i++) {
+            toCopy.append(Float.toString(calibrationMatrix.get(i)));
+            if (i % 3 == 2) {
+                toCopy.append("\n");
+            } else {
+                toCopy.append(" ");
+            }
+        }
+        content.putString(toCopy.toString());
+        clipboard.setContent(content);
+    }
+
     public void setCctText(double temperature) {
         Platform.runLater(() -> {
             this.measurement.setText("Temperature: ");
@@ -174,6 +218,25 @@ public class TestController {
             this.result.setText(Double.toString(illuminance));
             this.unit.setText(" lx");
         });
+    }
+
+    public void setCalibrationMatrix() {
+        this.clipboardButton.setVisible(false);
+        matrixGrid.getChildren().clear();
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                TextField tf = new TextField(String.format("%.02f", this.calibrationMatrix.get(y * 3 + x)));
+                tf.setMaxHeight(30);
+                tf.setMaxWidth(50);
+                tf.setMinHeight(30);
+                tf.setMinWidth(50);
+                tf.setAlignment(Pos.CENTER);
+                tf.setEditable(false);
+                tf.setFont(Font.font(14.0));
+                matrixGrid.add(tf, x, y, 1, 1);
+            }
+        }
+        this.clipboardButton.setVisible(true);
     }
 
     @FXML
