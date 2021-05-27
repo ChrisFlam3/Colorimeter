@@ -174,25 +174,25 @@ public class TestController {
     @FXML
     private void handleMatrixAction() {
         new Thread(() -> {
-//            setColor(Color.WHITE);
-//            main.sendInitialMessage((byte) 100, colorQueue.size());
+            setColor(Color.WHITE);
+            main.sendInitialMessage((byte) 100, colorQueue.size());
             calibrationMatrix.clear();
-//            while (!colorQueue.isEmpty()) {
-//                Color color = colorQueue.remove(0);
-//                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
-//                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
-//                setColor(corrected);
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//                sendMessage(color);
-//            }
-//            this.calibrationMatrix.addAll(this.main.receiveDifferences());
-            for (int i = 0; i < 12; i++) {
-                this.calibrationMatrix.add((float) (i + 0.2137));
+            while (!colorQueue.isEmpty()) {
+                Color color = colorQueue.remove(0);
+                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
+                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
+                setColor(corrected);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                sendMessage(color);
             }
+            this.calibrationMatrix.addAll(this.main.receiveDifferences());
+//            for (int i = 0; i < 12; i++) {
+//                this.calibrationMatrix.add((float) (i + 0.2137));
+//            }
             Platform.runLater(this::setCalibrationMatrix);
         }).start();
     }
