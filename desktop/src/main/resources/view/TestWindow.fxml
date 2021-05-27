@@ -52,6 +52,13 @@
                     </valueFactory>
                 </Spinner>
             </HBox>
+            <Button fx:id="matrixButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                    mnemonicParsing="false" onAction="#handleMatrixAction" text="Get Calibration Matrix">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </VBox.margin>
+            </Button>
+            
             <VBox alignment="CENTER">
                 <Spinner fx:id="measurementSpinner" prefWidth="120">
                     <HBox.margin>
@@ -72,12 +79,6 @@
                 </Button>
                 <Button fx:id="luxButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
                         mnemonicParsing="false" onAction="#handleLuxAction" text="Measure Illuminance">
-                    <VBox.margin>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </VBox.margin>
-                </Button>
-                <Button fx:id="matrixButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
-                        mnemonicParsing="false" onAction="#handleMatrixAction" text="Get Calibration Matrix">
                     <VBox.margin>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </VBox.margin>
