@@ -5,11 +5,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +32,7 @@ public class TestController {
     private AppController appController;
 
     private ObservableList<Color> colorQueue;
-
+    private ObservableList<Float> calibrationMatrix;
     @FXML
     private TextField rText;
 
@@ -52,6 +57,11 @@ public class TestController {
     @FXML
     private Label unit;
 
+    @FXML
+    private GridPane matrixGrid;
+
+    @FXML
+    private Button clipboardButton;
     private SerialJSC main;
 
     public void setAppController(AppController appController) {
@@ -66,7 +76,7 @@ public class TestController {
                         this.appController.primaryStage.getHeight() - 50 : this.appController.primaryStage.getWidth() - 175;
                 this.canvas.setHeight(size);
                 this.canvas.setWidth(size);
-                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+//                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
             }
             if (!this.isStateTesting) {
                 drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
@@ -79,7 +89,7 @@ public class TestController {
                         this.appController.primaryStage.getHeight() - 50 : this.appController.primaryStage.getWidth() - 175;
                 this.canvas.setHeight(size);
                 this.canvas.setWidth(size);
-                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
+//                drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
             }
             if (!this.isStateTesting) {
                 drawImage("file:///" + System.getProperty("user.dir") + "\\src\\main\\resources\\plots");
@@ -91,7 +101,8 @@ public class TestController {
     private void initialize() {
         this.isStateTesting = true;
         this.colorQueue = FXCollections.observableArrayList();
-
+        this.calibrationMatrix = FXCollections.observableArrayList();
+        this.clipboardButton.setVisible(false);
         new Thread(this::initializeSerial).start();
     }
 
@@ -138,7 +149,7 @@ public class TestController {
         if (measurementSpinner.getValue() > 0){
             new Thread(() -> {
                 this.isStateTesting = true;
-                sendMessage(Color.WHITE);
+                setColor(Color.WHITE);
                 main.sendInitialMessage((byte) 99, measurementSpinner.getValue());
                 float result = main.receiveFloat();
                 setCctText(result);
@@ -152,7 +163,7 @@ public class TestController {
         if (measurementSpinner.getValue() > 0){
             new Thread(() -> {
                 this.isStateTesting = true;
-                sendMessage(Color.WHITE);
+                setColor(Color.WHITE);
                 main.sendInitialMessage((byte) 108, measurementSpinner.getValue());
                 float result = main.receiveFloat();
                 setLuxText(result);
@@ -160,7 +171,48 @@ public class TestController {
             }).start();
         }
     }
+    @FXML
+    private void handleMatrixAction() {
+        new Thread(() -> {
+            setColor(Color.WHITE);
+            main.sendInitialMessage((byte) 100, colorQueue.size());
+            calibrationMatrix.clear();
+            while (!colorQueue.isEmpty()) {
+                Color color = colorQueue.remove(0);
+                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
+                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
+                setColor(corrected);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                sendMessage(color);
+            }
+            this.calibrationMatrix.addAll(this.main.receiveDifferences());
+//            for (int i = 0; i < 12; i++) {
+//                this.calibrationMatrix.add((float) (i + 0.2137));
+//            }
+            Platform.runLater(this::setCalibrationMatrix);
+        }).start();
+    }
 
+    @FXML
+    private void handleClipboardAction() {
+        final Clipboard clipboard = Clipboard.getSystemClipboard();
+        final ClipboardContent content = new ClipboardContent();
+        StringBuilder toCopy = new StringBuilder();
+        for (int i = 0; i < 9; i++) {
+            toCopy.append(Float.toString(calibrationMatrix.get(i)));
+            if (i % 3 == 2) {
+                toCopy.append("\n");
+            } else {
+                toCopy.append(" ");
+            }
+        }
+        content.putString(toCopy.toString());
+        clipboard.setContent(content);
+    }
     public void setCctText(double temperature) {
         Platform.runLater(() -> {
             this.measurement.setText("Temperature: ");
@@ -175,7 +227,24 @@ public class TestController {
             this.unit.setText(" lx");
         });
     }
-
+    public void setCalibrationMatrix() {
+        this.clipboardButton.setVisible(false);
+        matrixGrid.getChildren().clear();
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 4; y++) {
+                TextField tf = new TextField(String.format("%.04f", this.calibrationMatrix.get(y + 4 * x)));
+                tf.setMaxHeight(25);
+                tf.setMaxWidth(60);
+                tf.setMinHeight(25);
+                tf.setMinWidth(60);
+                tf.setAlignment(Pos.CENTER);
+                tf.setEditable(false);
+                tf.setFont(Font.font(12.0));
+                matrixGrid.add(tf, x, y, 1, 1);
+            }
+        }
+        this.clipboardButton.setVisible(true);
+    }
     @FXML
     private void handleExecuteAction() {
         new Thread(() -> {
@@ -194,23 +263,23 @@ public class TestController {
                 while (!colorQueue.isEmpty()) {
                     Color color = colorQueue.remove(0);
                     double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
-                    for(int i=0;i<3;i++){
-                        if(rgb[i]<=0.0031308)
-                            rgb[i]=12.92*rgb[i];
-                        else
-                            rgb[i]=(1.055*Math.pow(rgb[i],1/2.2)-0.055);
-                    }
+//                    for(int i=0;i<3;i++){
+//                        if(rgb[i]<=0.0031308)
+//                            rgb[i]=12.92*rgb[i];
+//                        else
+//                            rgb[i]=(1.055*Math.pow(rgb[i],1/2.2)-0.055);
+//                    }
                     Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
                     setColor(corrected);
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     sendMessage(color);
                 }
 
-                List<Float> dxdys = main.receiveDifferences(length);
+                List<Float> dxdys = main.receiveDifferences();
                 List<String> dxdysStrings = new ArrayList<>();
                 dxdys.stream().map(x -> x.toString()).forEach(xysStrings::add);
 
@@ -244,17 +313,17 @@ public class TestController {
         double height = canvas.getHeight();
         double width = canvas.getWidth();
         String filename = "";
-        int inches = 4;
-        while(inches < 9) {
-            if (height < (inches + 0.5) * 96){
-                filename = "\\plot" + Integer.toString(inches) + ".png";
-                break;
-            }
-            inches += 2;
-        }
-        if (inches >= 9) {
-            filename = "\\plot" + Integer.toString(inches) + ".png";
-        }
+        int inches = 10;
+//        while(inches < 9) {
+//            if (height < (inches + 0.5) * 96){
+//                filename = "\\plot" + Integer.toString(inches) + ".png";
+//                break;
+//            }
+//            inches += 2;
+//        }
+//        if (inches >= 9) {
+        filename = "\\plot" + Integer.toString(inches) + ".png";
+//        }
         setCanvasColor(Color.WHITE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         Image image = new Image(path + filename, width, height, false, true);

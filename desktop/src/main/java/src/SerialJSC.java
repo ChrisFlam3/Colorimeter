@@ -31,7 +31,7 @@ public class SerialJSC {
         response[0] = 0;
         while (response[0] != (byte)255) {
             int numRead = comPort.readBytes(response, 1);
-            //System.out.println("Response: " + new String(response, StandardCharsets.US_ASCII));
+            System.out.println("Response: " + new String(response, StandardCharsets.US_ASCII));
         }
     }
 
@@ -46,7 +46,7 @@ public class SerialJSC {
         }
     }
 
-    public synchronized List<Float> receiveDifferences (int length) {
+    public synchronized List<Float> receiveDifferences () {
         List<Float> convertedList=new ArrayList<>();
         String result="";
         while (true) {
@@ -87,5 +87,37 @@ public class SerialJSC {
             return Float.parseFloat(responseString);
         }
     }
-
+//    public synchronized void receiveCalib (int length) {
+//        //List<Float> XYZ=receiveDifferences();
+//       // List<Float> XYZ_source=receiveDifferences();
+//        SimpleMatrix X=new SimpleMatrix(3,3);
+//        SimpleMatrix Y=new SimpleMatrix(3,1);
+//        /*for(int i=0;i<length;i++){
+//            X.set(i,0,XYZ.get(3*i));
+//            X.set(i,1,XYZ.get(3*i+1));
+//            X.set(i,2,XYZ.get(3*i+2));
+//
+//            Y.set(i,0,XYZ_source.get(3*i));
+//            Y.set(i,1,XYZ_source.get(3*i+1));
+//            Y.set(i,2,XYZ_source.get(3*i+2));
+//        }*/
+//        X.set(0,0,0.2);
+//        X.set(0,1,0.1);
+//        X.set(0,2,0.1);
+//        X.set(1,0,0.2);
+//        X.set(1,1,0.1);
+//        X.set(1,2,0.1);
+//        X.set(2,0,0.2);
+//        X.set(2,1,0.1);
+//        X.set(2,2,0.1);
+//
+//        Y.set(0,0,1.0);
+//        Y.set(1,0,0.0);
+//        Y.set(2,0,0.0);
+//
+//        var a=X.solve(Y);
+//        LinearSolverFactory_DDRM.general(1,1).solve(X.getDDRM(),Y.getDDRM());
+//
+//        return ;
+//    }
 }
