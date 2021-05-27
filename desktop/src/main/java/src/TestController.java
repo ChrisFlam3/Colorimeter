@@ -189,11 +189,8 @@ public class TestController {
                 }
                 sendMessage(color);
             }
-            var mat=main.receiveDifferences();
-//            for(int i = 0; i < 9; i++) {
-//                calibrationMatrix.add(main.receiveFloat());
-//            }
-//            setCalibrationMatrix();
+            this.calibrationMatrix.addAll(this.main.receiveDifferences());
+            Platform.runLater(this::setCalibrationMatrix);
         }).start();
     }
 
