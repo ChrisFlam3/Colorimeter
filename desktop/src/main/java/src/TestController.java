@@ -202,12 +202,14 @@ public class TestController {
         final Clipboard clipboard = Clipboard.getSystemClipboard();
         final ClipboardContent content = new ClipboardContent();
         StringBuilder toCopy = new StringBuilder();
-        for (int i = 0; i < 9; i++) {
-            toCopy.append(Float.toString(calibrationMatrix.get(i)));
-            if (i % 3 == 2) {
-                toCopy.append("\n");
-            } else {
-                toCopy.append(" ");
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 3; x++) {
+                toCopy.append(Float.toString(calibrationMatrix.get(y + 4 * x)));
+                if (x == 2) {
+                    toCopy.append("\n");
+                } else {
+                    toCopy.append(" ");
+                }
             }
         }
         content.putString(toCopy.toString());
