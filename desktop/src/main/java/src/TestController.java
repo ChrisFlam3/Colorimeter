@@ -174,22 +174,25 @@ public class TestController {
     @FXML
     private void handleMatrixAction() {
         new Thread(() -> {
-            setColor(Color.WHITE);
-            main.sendInitialMessage((byte) 100, colorQueue.size());
+//            setColor(Color.WHITE);
+//            main.sendInitialMessage((byte) 100, colorQueue.size());
             calibrationMatrix.clear();
-            while (!colorQueue.isEmpty()) {
-                Color color = colorQueue.remove(0);
-                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
-                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
-                setColor(corrected);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                sendMessage(color);
+//            while (!colorQueue.isEmpty()) {
+//                Color color = colorQueue.remove(0);
+//                double[] rgb={color.getRed(),color.getGreen(),color.getBlue()};
+//                Color corrected=Color.rgb((int)(rgb[0]*255),(int)(rgb[1]*255),(int)(rgb[2]*255));
+//                setColor(corrected);
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                sendMessage(color);
+//            }
+//            this.calibrationMatrix.addAll(this.main.receiveDifferences());
+            for (int i = 0; i < 12; i++) {
+                this.calibrationMatrix.add((float) (i + 0.2137));
             }
-            this.calibrationMatrix.addAll(this.main.receiveDifferences());
             Platform.runLater(this::setCalibrationMatrix);
         }).start();
     }
@@ -228,15 +231,15 @@ public class TestController {
         this.clipboardButton.setVisible(false);
         matrixGrid.getChildren().clear();
         for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
-                TextField tf = new TextField(String.format("%.02f", this.calibrationMatrix.get(y * 3 + x)));
-                tf.setMaxHeight(30);
-                tf.setMaxWidth(50);
-                tf.setMinHeight(30);
-                tf.setMinWidth(50);
+            for (int y = 0; y < 4; y++) {
+                TextField tf = new TextField(String.format("%.04f", this.calibrationMatrix.get(y + 4 * x)));
+                tf.setMaxHeight(25);
+                tf.setMaxWidth(51);
+                tf.setMinHeight(25);
+                tf.setMinWidth(51);
                 tf.setAlignment(Pos.CENTER);
                 tf.setEditable(false);
-                tf.setFont(Font.font(14.0));
+                tf.setFont(Font.font(12.0));
                 matrixGrid.add(tf, x, y, 1, 1);
             }
         }

@@ -35,7 +35,7 @@
             </VBox>
             <HBox alignment="TOP_CENTER">
                 <HBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    <Insets bottom="2.0" left="5.0" right="5.0" top="5.0"/>
                 </HBox.margin>
                 <Button fx:id="randomButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
                         mnemonicParsing="false" onAction="#handleRandomAction" text="Random Color">
@@ -55,10 +55,10 @@
             <Button fx:id="matrixButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
                     mnemonicParsing="false" onAction="#handleMatrixAction" text="Get Calibration Matrix">
                 <VBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    <Insets bottom="1.0" left="5.0" right="5.0" top="5.0"/>
                 </VBox.margin>
             </Button>
-            
+
             <VBox alignment="CENTER">
                 <Spinner fx:id="measurementSpinner" prefWidth="120">
                     <HBox.margin>
@@ -69,7 +69,7 @@
                     </valueFactory>
                 </Spinner>
                 <VBox.margin>
-                    <Insets bottom="100.0" left="5.0" right="5.0" top="100.0"/>
+                    <Insets bottom="40.0" left="5.0" right="5.0" top="100.0"/>
                 </VBox.margin>
                 <Button fx:id="cctButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
                         mnemonicParsing="false" onAction="#handleCctAction" text="Measure CCT">
@@ -107,7 +107,7 @@
                 <Button fx:id="executeButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
                         mnemonicParsing="false" onAction="#handleExecuteAction" text="Execute">
                     <VBox.margin>
-                        <Insets bottom="0.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="2.0" left="5.0" right="5.0" top="5.0"/>
                     </VBox.margin>
                 </Button>
             </VBox>
