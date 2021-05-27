@@ -234,9 +234,9 @@ public class TestController {
             for (int y = 0; y < 4; y++) {
                 TextField tf = new TextField(String.format("%.04f", this.calibrationMatrix.get(y + 4 * x)));
                 tf.setMaxHeight(25);
-                tf.setMaxWidth(51);
+                tf.setMaxWidth(60);
                 tf.setMinHeight(25);
-                tf.setMinWidth(51);
+                tf.setMinWidth(60);
                 tf.setAlignment(Pos.CENTER);
                 tf.setEditable(false);
                 tf.setFont(Font.font(12.0));
