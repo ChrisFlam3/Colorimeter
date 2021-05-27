@@ -40,9 +40,9 @@ def draw_plot(xs, ys, dxs, dys, path):
     for arrow in arrows:
         fig.add_artist(arrow)
 
-    for i in range(4, 11, 2):
-        fig.set_size_inches(i, i)
-        fig.savefig(path + "\\plot" + str(i) + ".png", dpi=96)
+    # for i in range(4, 11, 2):
+    fig.set_size_inches(10, 10)
+    fig.savefig(path + "\\plot" + str(10) + ".png", dpi=96)
 
 
 def main():

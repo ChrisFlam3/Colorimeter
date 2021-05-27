@@ -76,6 +76,21 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </VBox.margin>
                 </Button>
+                <Button fx:id="matrixButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleMatrixAction" text="Get Calibration Matrix">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                </Button>
+
+                <GridPane fx:id="matrixGrid" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"/>
+
+                <Button fx:id="clipboardButton" alignment="TOP_CENTER" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" onAction="#handleClipboardAction" text="Copy to Clipboard">
+                    <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </VBox.margin>
+                </Button>
                 <HBox alignment="CENTER">
                     <Label fx:id="measurement"/>
                     <Label fx:id="result"/>
