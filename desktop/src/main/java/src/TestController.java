@@ -328,7 +328,7 @@ public class TestController {
 //        }
         setCanvasColor(Color.WHITE);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        Image image = new Image(path + filename, width, height, false, true);
+        Image image = new Image(path + filename, width, height, true, true);
         gc.drawImage(image, 0, 0);
     }
 
